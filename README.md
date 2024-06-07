@@ -13,9 +13,10 @@ Simple CustomLLM definition to leverage IBM watsonx LLMs on Continue extentions.
     ```
 3. Copy the provided `config.ts` in `~/.continue/config.ts`:
     ```sh
-    wget 
+    wget https://raw.githubusercontent.com/NoeSamaille/continue-watsonx/main/config.ts -O ~/.continue/config.ts
     ```
 4. Replace `YOUR_WATSONX_API_KEY` and `YOUR_WATSONX_PROJECT_ID` with your IBM watsonx.ai API Key and project ID in `~/.continue/config.ts`.
+5. Enjoy!
 
 ## To-do
 
