@@ -4,17 +4,25 @@ interface accessToken {
 }
 
 const watsonxConfig = {
-  url: "YOUR_WATSONX_URL", // e.g. https://us-south.ml.cloud.ibm.com for watsonx SaaS
-  apiKey: "YOUR_WATSONX_APIKEY", // Optional, if using watsonx SaaS
-  username: "YOUR_WATSONX_USERNAME", // Optional, if using watsonx software
-  password: "YOUR_WATSONX_PASSWORD", // Optional, if using watsonx software
-  projectId: "YOUR_WATSONX_PROJECT_ID",
+  url: "YOUR_WATSONX_URL", // Required, e.g. https://us-south.ml.cloud.ibm.com for watsonx SaaS
+  apiKey: "YOUR_WATSONX_APIKEY", // Required if using watsonx SaaS
+  username: "YOUR_WATSONX_USERNAME", // Required if using watsonx software
+  password: "YOUR_WATSONX_PASSWORD", // Required if using watsonx software
+  projectId: "YOUR_WATSONX_PROJECT_ID", // Required
   modelId: "ibm/granite-34b-code-instruct",
   accessToken: {
     expiration: 0,
     token: ""
   }
 }
+
+// Uncomment the following 6 lines if using a watsonx software instance with self-signed certificates.
+// declare var process : {
+//   env: {
+//     NODE_TLS_REJECT_UNAUTHORIZED: any
+//   }
+// }
+// process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
 function templateGraniteMessages(msgs: ChatMessage[]): string {
   let prompt = "";
@@ -73,9 +81,6 @@ async function getBearerToken(): Promise<accessToken> {
 
 export function modifyConfig(config: Config): Config {
   config.models.push({
-    requestOptions: {
-      verifySsl: false
-    },
     options: {
       title: "watsonx - Granite 34B Code Instruct",
       model: "granite-34b-code-instruct",
@@ -148,9 +153,5 @@ export function modifyConfig(config: Config): Config {
       }
     }
   });
-  if (!config.requestOptions) {
-    config.requestOptions = {}
-  }
-  config.requestOptions.verifySsl = false;
   return config;
 }
