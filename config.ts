@@ -4,12 +4,47 @@ interface accessToken {
 }
 
 const watsonxConfig = {
-  url: "YOUR_WATSONX_URL", // Required, e.g. https://us-south.ml.cloud.ibm.com for watsonx SaaS
+  url: "YOUR_WATSONX_URL", // Required, e.g. https://us-south.ml.cloud.ibm.com for watsonx SaaS in US South
   apiKey: "YOUR_WATSONX_APIKEY", // Required if using watsonx SaaS
   username: "YOUR_WATSONX_USERNAME", // Required if using watsonx software
   password: "YOUR_WATSONX_PASSWORD", // Required if using watsonx software
   projectId: "YOUR_WATSONX_PROJECT_ID", // Required
-  modelId: "ibm/granite-34b-code-instruct",
+  models: [
+    {
+      id: "ibm/granite-34b-code-instruct",
+      options: {
+        title: "watsonx - Granite Code",
+        model: "ibm-granite",
+        templateMessages: templateGraniteMessages,
+        systemMessage: `You are Granite Chat, an AI language model developed by IBM. You are a cautious assistant. You carefully follow instructions. You are helpful and harmless and you follow ethical guidelines and promote positive behavior. You always respond to greetings (for example, hi, hello, g'day, morning, afternoon, evening, night, what's up, nice to meet you, sup, etc) with "Hello! I am Granite Chat, created by IBM. How can I help you today?". Please do not say anything else and do not start a conversation.`
+      }
+    },
+    {
+      id: "ibm/granite-13b-chat-v2",
+      options: {
+        title: "watsonx - Granite Chat",
+        model: "ibm-granite",
+        templateMessages: templateGraniteMessages,
+        systemMessage: `You are Granite Chat, an AI language model developed by IBM. You are a cautious assistant. You carefully follow instructions. You are helpful and harmless and you follow ethical guidelines and promote positive behavior. You always respond to greetings (for example, hi, hello, g'day, morning, afternoon, evening, night, what's up, nice to meet you, sup, etc) with "Hello! I am Granite Chat, created by IBM. How can I help you today?". Please do not say anything else and do not start a conversation.`
+      }
+    },
+    {
+      id: "meta-llama/llama-3-70b-instruct",
+      options: {
+        title: "watsonx - Llama 3",
+        model: "llama3-70b",
+        systemMessage: `You always answer the questions with markdown formatting using GitHub syntax. The markdown formatting you support: headings, bold, italic, links, tables, lists, code blocks, and blockquotes. You must omit that you answer the questions with markdown.\n\nAny HTML tags must be wrapped in block quotes, for example \`\`\`<html>\`\`\`. You will be penalized for not rendering code in block quotes.\n\nWhen returning code blocks, specify language.\n\nYou are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe. \nYour answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.\n\nIf a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.`
+      }
+    },
+    {
+      id: "mistralai/mixtral-8x7b-instruct-v01",
+      options: {
+        title: "watsonx - Mixtral-8x7b",
+        model: "mistral-8x7b",
+        systemMessage: `You are Mixtral Chat, an AI language model developed by Mistral AI. You are a cautious assistant. You carefully follow instructions. You are helpful and harmless and you follow ethical guidelines and promote positive behavior.`
+      }
+    },
+  ],
   accessToken: {
     expiration: 0,
     token: ""
@@ -80,78 +115,75 @@ async function getBearerToken(): Promise<accessToken> {
 }
 
 export function modifyConfig(config: Config): Config {
-  config.models.push({
-    options: {
-      title: "watsonx - Granite 34B Code Instruct",
-      model: "granite-34b-code-instruct",
-      templateMessages: templateGraniteMessages,
-      systemMessage: `You are Granite Chat, an AI language model developed by IBM. You are a cautious assistant. You carefully follow instructions. You are helpful and harmless and you follow ethical guidelines and promote positive behavior. You always respond to greetings (for example, hi, hello, g'day, morning, afternoon, evening, night, what's up, nice to meet you, sup, etc) with "Hello! I am Granite Chat, created by IBM. How can I help you today?". Please do not say anything else and do not start a conversation.`
-    },
-    streamCompletion: async function* (
-      prompt: string,
-      options: CompletionOptions,
-    ) {
-      var now = (new Date()).getTime() / 1000;
-      if (watsonxConfig.accessToken === undefined || now > watsonxConfig.accessToken.expiration) {
-        watsonxConfig.accessToken = await getBearerToken();
-      } else {
-        console.log(`Reusing token (expires in ${(watsonxConfig.accessToken.expiration - now) / 60} mins)`);
-      }
-      const streamResponse = await fetch(`${watsonxConfig.url}/ml/v1/text/generation_stream?version=2023-05-29`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${watsonxConfig.accessToken.token}`
-        },
-        body: JSON.stringify({
-          "input": prompt,
-          "parameters": {
-            "decoding_method": "greedy",
-            "max_new_tokens": options.maxTokens ?? 1024,
-            "min_new_tokens": 1,
-            "stop_sequences": [],
-            "repetition_penalty": 1
+  watsonxConfig.models.forEach(model => {
+    config.models.push({
+      options: model.options,
+      streamCompletion: async function* (
+        prompt: string,
+        options: CompletionOptions,
+      ) {
+        var now = (new Date()).getTime() / 1000;
+        if (watsonxConfig.accessToken === undefined || now > watsonxConfig.accessToken.expiration) {
+          watsonxConfig.accessToken = await getBearerToken();
+        } else {
+          console.log(`Reusing token (expires in ${(watsonxConfig.accessToken.expiration - now) / 60} mins)`);
+        }
+        const streamResponse = await fetch(`${watsonxConfig.url}/ml/v1/text/generation_stream?version=2023-05-29`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${watsonxConfig.accessToken.token}`
           },
-          "model_id": watsonxConfig.modelId,
-          "project_id": watsonxConfig.projectId
-        })
-      });
-      if (!streamResponse.ok || streamResponse.body === null) {
-        console.error("No response received, reverting to fallback mode");
-      } else {
-        const reader = streamResponse.body.getReader();
-        while (true) {
-          const chunk = await reader.read();
-          if (chunk.done) break;
+          body: JSON.stringify({
+            "input": prompt,
+            "parameters": {
+              "decoding_method": "greedy",
+              "max_new_tokens": options.maxTokens ?? 1024,
+              "min_new_tokens": 1,
+              "stop_sequences": [],
+              "repetition_penalty": 1
+            },
+            "model_id": model.id,
+            "project_id": watsonxConfig.projectId
+          })
+        });
+        if (!streamResponse.ok || streamResponse.body === null) {
+          console.error("No response received, reverting to fallback mode");
+        } else {
+          const reader = streamResponse.body.getReader();
+          while (true) {
+            const chunk = await reader.read();
+            if (chunk.done) break;
 
-          // Decode the stream
-          const textResponseMsg = new TextDecoder().decode(chunk.value);
-          const lines = textResponseMsg.split(/\r?\n/);
+            // Decode the stream
+            const textResponseMsg = new TextDecoder().decode(chunk.value);
+            const lines = textResponseMsg.split(/\r?\n/);
 
-          let generatedChunk = "";
-          let generatedTextIndex = undefined;
-          lines.forEach((el) => {
-            if (el.startsWith("id:")) {
-              generatedTextIndex = parseInt(el.replace(/^id:\s+/, ""));
-              if (isNaN(generatedTextIndex))
-                console.error(`Unable to parse stream chunk ID: ${el}`);
-            } else if (el.startsWith("data:")) {
-              const dataStr = el.replace(/^data:\s+/, "");
-              try {
-                const data = JSON.parse(dataStr);
-                data.results.forEach((result: any) => {
-                  generatedChunk += result.generated_text || "";
-                });
-              } catch (e) {
-                console.error(e);
+            let generatedChunk = "";
+            let generatedTextIndex = undefined;
+            lines.forEach((el) => {
+              if (el.startsWith("id:")) {
+                generatedTextIndex = parseInt(el.replace(/^id:\s+/, ""));
+                if (isNaN(generatedTextIndex))
+                  console.error(`Unable to parse stream chunk ID: ${el}`);
+              } else if (el.startsWith("data:")) {
+                const dataStr = el.replace(/^data:\s+/, "");
+                try {
+                  const data = JSON.parse(dataStr);
+                  data.results.forEach((result: any) => {
+                    generatedChunk += result.generated_text || "";
+                  });
+                } catch (e) {
+                  console.error(e);
+                }
               }
-            }
-          });
+            });
 
-          yield generatedChunk;
+            yield generatedChunk;
+          }
         }
       }
-    }
+    });
   });
   return config;
 }

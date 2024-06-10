@@ -12,7 +12,7 @@ Simple CustomLLM definition to leverage IBM watsonx LLMs on Continue extentions.
 - [x] Bearer token rotation.
 - [x] Custom prompt template for Granite.
 - [x] Support watsonx.ai Software.
-- [ ] Support non-granite LLM.
+- [x] Support non-granite LLM.
 - [ ] Create separate Chat and Completion models.
 
 ## Get started (~ 2min)
@@ -46,5 +46,5 @@ Simple CustomLLM definition to leverage IBM watsonx LLMs on Continue extentions.
         }
         process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
         ```
-   3. *Optionally*, update `modelId` to target another Granite model deployed in your watsonx instance.
+   3. *Optionally*, update `models` to comment/uncomment/edit model list based on LLMs deployed in your watsonx instance.
 5. Enjoy!
