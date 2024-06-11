@@ -6,8 +6,9 @@ interface accessToken {
 const watsonxConfig = {
   url: "YOUR_WATSONX_URL", // Required, e.g. https://us-south.ml.cloud.ibm.com for watsonx SaaS in US South
   apiKey: "YOUR_WATSONX_APIKEY", // Required if using watsonx SaaS
-  username: "YOUR_WATSONX_USERNAME", // Required if using watsonx software
-  password: "YOUR_WATSONX_PASSWORD", // Required if using watsonx software
+  zenApiKeyBase64: "YOUR_WATSONX_ZENAPIKEY", // Required if using watsonx software with ZenApiKey auth
+  username: "YOUR_WATSONX_USERNAME", // Required if using watsonx software with username/password auth
+  password: "YOUR_WATSONX_PASSWORD", // Required if using watsonx software with username/password auth
   projectId: "YOUR_WATSONX_PROJECT_ID", // Required
   models: [
     {
@@ -89,27 +90,36 @@ async function getBearerToken(): Promise<accessToken> {
     }
   } else {
     // watsonx Software
-    const wxToken = await (await fetch(`${watsonxConfig.url}/icp4d-api/v1/authorize`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        "username": watsonxConfig.username,
-        "password": watsonxConfig.password
-      })
-    })).json();
-    const wxTokenExpiry = await (await fetch(`${watsonxConfig.url}/usermgmt/v1/user/tokenExpiry`, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${wxToken["token"]}`
+    if (watsonxConfig.zenApiKeyBase64 && watsonxConfig.zenApiKeyBase64 !== "YOUR_WATSONX_ZENAPIKEY") {
+      // Using ZenApiKey auth
+      return {
+        token: watsonxConfig.zenApiKeyBase64,
+        expiration: -1
       }
-    })).json();
-    return {
-      token: wxToken["token"],
-      expiration: wxTokenExpiry["exp"]
+    } else {
+      // Using username/password auth
+      const wxToken = await (await fetch(`${watsonxConfig.url}/icp4d-api/v1/authorize`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          "username": watsonxConfig.username,
+          "password": watsonxConfig.password
+        })
+      })).json();
+      const wxTokenExpiry = await (await fetch(`${watsonxConfig.url}/usermgmt/v1/user/tokenExpiry`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${wxToken["token"]}`
+        }
+      })).json();
+      return {
+        token: wxToken["token"],
+        expiration: wxTokenExpiry["exp"]
+      }
     }
   }
 }
@@ -132,7 +142,7 @@ export function modifyConfig(config: Config): Config {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${watsonxConfig.accessToken.token}`
+            'Authorization': `${watsonxConfig.accessToken.expiration === -1 ? 'ZenApiKey' : 'Bearer'} ${watsonxConfig.accessToken.token}`
           },
           body: JSON.stringify({
             "input": prompt,

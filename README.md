@@ -12,7 +12,7 @@ Simple CustomLLM definition to leverage IBM watsonx LLMs on Continue extentions.
 - [x] Bearer token rotation.
 - [x] Custom prompt template for Granite.
 - [x] Support watsonx.ai Software.
-- [x] Support non-granite LLM.
+- [x] Support non-granite LLMs.
 - [ ] Create separate Chat and Completion models.
 
 ## Get started (~ 2min)
@@ -32,10 +32,23 @@ Simple CustomLLM definition to leverage IBM watsonx LLMs on Continue extentions.
       - Replace `YOUR_WATSONX_APIKEY` with your watsonx API Key.
       - Replace `YOUR_WATSONX_PROJECT_ID` with your watsonx project ID.
    2. If using watsonx software:
-      - Replace `YOUR_WATSONX_URL` with your watsonx software endpoint, e.g. `https://cpd-watsonx.apps.example.com`.
-      - Replace `YOUR_WATSONX_USERNAME` with your watsonx username, e.g. `cpadmin`.
-      - Replace `YOUR_WATSONX_PASSWORD` with your watsonx password.
-      - Replace `YOUR_WATSONX_PROJECT_ID` with your watsonx project ID.
+      1. *Option 1*: using username/password authentication:
+         - Replace `YOUR_WATSONX_URL` with your watsonx software endpoint, e.g. `https://cpd-watsonx.apps.example.com`.
+         - Replace `YOUR_WATSONX_USERNAME` with your watsonx username, e.g. `cpadmin`.
+         - Replace `YOUR_WATSONX_PASSWORD` with your watsonx password.
+         - Replace `YOUR_WATSONX_PROJECT_ID` with your watsonx project ID.
+      2. *Option 2*: using API Key authentication:
+         - Replace `YOUR_WATSONX_URL` with your watsonx software endpoint, e.g. `https://cpd-watsonx.apps.example.com`.
+         - Replace `YOUR_WATSONX_ZENAPIKEY` with your watsonx Zen API Key. To generate it:
+            1. Log in to the CPD web client.
+            2. From the toolbar, click your avatar.
+            3. Click **Profile and settings**.
+            4. Click **API key** > **Generate new key**.
+            5. Click **Generate**.
+            6. Click **Copy** and save your key somewhere safe. You cannot recover this key if you lose it.
+            7. Generate your ZenApiKey by running the following command: `echo "<username>:<apikey>" | base64`, replacing `<username>` with your CPD username and `<apikey>` with the API Key you just created.
+         - Replace `YOUR_WATSONX_PROJECT_ID` with your watsonx project ID.
+    - 
       - **Note**: if using watsonx software instance with self-signed/untrusted TLS certificates, uncomment the following lines in `~/.continue/config.ts` to bypass SSL certificate verification:
 
         ```ts
