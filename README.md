@@ -35,7 +35,7 @@ Simple CustomLLM definition to leverage IBM watsonx LLMs on Continue extentions.
     ```ts
     import {Watsonx} from "./continue-watsonx/src/watsonx"; 
     export function modifyConfig(config: Config): Config {
-        return Watsonx.addConfig(config);
+        return Watsonx.modifyConfig(config);
     }
     ```
 5. Update `watsonxConfig` in `~/.continue/config.ts` with your target configuration:
