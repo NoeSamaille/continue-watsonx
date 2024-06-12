@@ -18,15 +18,27 @@ Simple CustomLLM definition to leverage IBM watsonx LLMs on Continue extentions.
 ## Get started (~ 2min)
 
 1. Install [Continue](https://www.continue.dev/) extension (tested with VSCode extension).
-2. Make a local copy of your local Continue config:
+2. Clone this reposiroty in your `~/.continue/` directory
+    ```sh
+    cd ~/.continue/
+    git clone https://github.com/remiserra/continue-watsonx.git
+    ```
+3. Make a local copy of your local Continue config:
     ```sh
     mv ~/.continue/config.ts ~/.continue/config-backup.ts
     ```
-3. Copy the provided `config.ts` in `~/.continue/config.ts`:
+4. Copy the provided `config-sample.ts` to `~/.continue/config.ts`:
     ```sh
-    wget https://raw.githubusercontent.com/NoeSamaille/continue-watsonx/main/config.ts -O ~/.continue/config.ts
+    cp ~/.continue/continue-watsonx/src/config-samples.ts ~/.continue/config.ts
     ```
-4. Update `watsonxConfig` in `~/.continue/config.ts` with your target configuration:
+    or, if you have customized your `config.ts`, manually add the code to load the `Watsonx` module and use `Watsonx.addConfig()`:
+    ```ts
+    import {Watsonx} from "./continue-watsonx/src/watsonx"; 
+    export function modifyConfig(config: Config): Config {
+        return Watsonx.addConfig(config);
+    }
+    ```
+5. Update `watsonxConfig` in `~/.continue/config.ts` with your target configuration:
    1. If using watsonx SaaS:
       - Replace `YOUR_WATSONX_URL` with your watsonx SaaS endpoint, e.g. `https://us-south.ml.cloud.ibm.com` for US South region.
       - Replace `YOUR_WATSONX_APIKEY` with your watsonx API Key.
@@ -60,4 +72,4 @@ Simple CustomLLM definition to leverage IBM watsonx LLMs on Continue extentions.
         process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
         ```
    3. *Optionally*, update `models` to comment/uncomment/edit model list based on LLMs deployed in your watsonx instance.
-5. Enjoy!
+6. Enjoy!
