@@ -1,4 +1,4 @@
-import {Granite} from "./continue-watsonx/src/watsonx"; 
+import {Watsonx} from "./continue-watsonx/src/watsonx"; 
 
 // Original:
 //export function modifyConfig(config: Config): Config {
@@ -6,5 +6,5 @@ import {Granite} from "./continue-watsonx/src/watsonx";
 //}
 
 export function modifyConfig(config: Config): Config {
-  return Granite.addConfig(config);
+  return Watsonx.modifyConfig(config);
 }
