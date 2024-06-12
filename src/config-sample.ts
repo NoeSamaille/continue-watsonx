@@ -1,4 +1,4 @@
-import {Watsonx} from "./continue-watsonx/src/watsonx"; 
+import {Watsonx} from "./continue-watsonx/src/Watsonx"; 
 
 // Original:
 //export function modifyConfig(config: Config): Config {
