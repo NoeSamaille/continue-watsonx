@@ -23,6 +23,11 @@ Simple CustomLLM definition to leverage IBM watsonx LLMs on Continue extentions.
     cd ~/.continue/
     git clone https://github.com/remiserra/continue-watsonx.git
     ```
+    and switch to the this branch
+    ```sh
+    cd continue-watsonx
+    git switch feat-as-ts-module
+    ```
 3. Make a local copy of your local Continue config:
     ```sh
     mv ~/.continue/config.ts ~/.continue/config-backup.ts
