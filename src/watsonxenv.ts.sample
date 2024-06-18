@@ -1,0 +1,6 @@
+export const watsonxUrl = 'YOUR_WATSONX_URL' // Required, e.g. https://us-south.ml.cloud.ibm.com for watsonx SaaS in US South
+export const watsonxApiKey = 'YOUR_IBMCLOUD_APIKEY' // Required if using watsonx SaaS
+export const watsonxZenApiKeyBase64 = "YOUR_WATSONX_ZENAPIKEY" // Required if using watsonx software with ZenApiKey auth
+export const watsonxUsername = "YOUR_WATSONX_USERNAME" // Required if using watsonx software with username/password auth
+export const watsonxPassword = "YOUR_WATSONX_PASSWORD" // Required if using watsonx software with username/password auth
+export const watsonxProjectId = 'YOUR_WATSONX_PROJECT_ID' // Required

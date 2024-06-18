@@ -18,15 +18,35 @@ Simple CustomLLM definition to leverage IBM watsonx LLMs on Continue extentions.
 ## Get started (~ 2min)
 
 1. Install [Continue](https://www.continue.dev/) extension (tested with VSCode extension).
-2. Make a local copy of your local Continue config:
+2. Clone this reposiroty in your `~/.continue/` directory
+    ```sh
+    cd ~/.continue/
+    git clone https://github.com/NoeSamaille/continue-watsonx.git
+    ```
+    and switch to the this branch
+    ```sh
+    cd continue-watsonx
+    git switch feat-as-ts-module
+    ```
+3. Make a local copy of your local Continue config:
     ```sh
     mv ~/.continue/config.ts ~/.continue/config-backup.ts
     ```
-3. Copy the provided `config.ts` in `~/.continue/config.ts`:
+4. Copy the provided `config-sample.ts` to replace `~/.continue/config.ts`:
     ```sh
-    wget https://raw.githubusercontent.com/NoeSamaille/continue-watsonx/main/config.ts -O ~/.continue/config.ts
+    cp ~/.continue/continue-watsonx/src/config-sample.ts ~/.continue/config.ts
     ```
-4. Update `watsonxConfig` in `~/.continue/config.ts` with your target configuration:
+    or, if you have customized your `config.ts`, manually add the code to load the `Watsonx` module and use `Watsonx.addConfig()`:
+    ```ts
+    import {watsonx_modifyConfig} from "./continue-watsonx/src/watsonx"; 
+    export function modifyConfig(config: Config): Config {
+        return watsonx_modifyConfig(config);
+    }
+    ```
+5. Copy `src/watsonxenv.ts.sample` to `src/watsonxenv.ts` and update `WatsonxEnv` with your target configuration:
+    ```sh
+    cp ~/.continue/continue-watsonx/src/watsonxenv.ts.sample ~/.continue/continue-watsonx/src/watsonxenv.ts
+    ```
    1. If using watsonx SaaS:
       - Replace `YOUR_WATSONX_URL` with your watsonx SaaS endpoint, e.g. `https://us-south.ml.cloud.ibm.com` for US South region.
       - Replace `YOUR_WATSONX_APIKEY` with your watsonx API Key.
@@ -49,7 +69,7 @@ Simple CustomLLM definition to leverage IBM watsonx LLMs on Continue extentions.
             7. Generate your ZenApiKey by running the following command: `echo "<username>:<apikey>" | base64`, replacing `<username>` with your CPD username and `<apikey>` with the API Key you just created.
          - Replace `YOUR_WATSONX_PROJECT_ID` with your watsonx project ID.
     - 
-      - **Note**: if using watsonx software instance with self-signed/untrusted TLS certificates, uncomment the following lines in `~/.continue/config.ts` to bypass SSL certificate verification:
+      - **Note**: if using watsonx software instance with self-signed/untrusted TLS certificates, uncomment the following lines in `~/.continue/continue-watsonx/src/watsonx.ts` to bypass SSL certificate verification:
 
         ```ts
         declare var process : {
@@ -60,4 +80,9 @@ Simple CustomLLM definition to leverage IBM watsonx LLMs on Continue extentions.
         process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
         ```
    3. *Optionally*, update `models` to comment/uncomment/edit model list based on LLMs deployed in your watsonx instance.
-5. Enjoy!
+6. Enjoy!
+
+## Contributors
+
+- @NoeSamaille
+- @remiserra

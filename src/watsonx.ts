@@ -1,15 +1,17 @@
+import { watsonxUrl, watsonxApiKey, watsonxZenApiKeyBase64, watsonxUsername, watsonxPassword, watsonxProjectId } from "./watsonxenv";
+
 interface accessToken {
   expiration: number,
   token: string
 }
 
 const watsonxConfig = {
-  url: "YOUR_WATSONX_URL", // Required, e.g. https://us-south.ml.cloud.ibm.com for watsonx SaaS in US South
-  apiKey: "YOUR_WATSONX_APIKEY", // Required if using watsonx SaaS
-  zenApiKeyBase64: "YOUR_WATSONX_ZENAPIKEY", // Required if using watsonx software with ZenApiKey auth
-  username: "YOUR_WATSONX_USERNAME", // Required if using watsonx software with username/password auth
-  password: "YOUR_WATSONX_PASSWORD", // Required if using watsonx software with username/password auth
-  projectId: "YOUR_WATSONX_PROJECT_ID", // Required
+  url: watsonxUrl,
+  apiKey: watsonxApiKey,
+  zenApiKeyBase64: watsonxZenApiKeyBase64,
+  username: watsonxUsername,
+  password: watsonxPassword,
+  projectId: watsonxProjectId,
   models: [
     {
       id: "ibm/granite-34b-code-instruct",
@@ -124,7 +126,7 @@ async function getBearerToken(): Promise<accessToken> {
   }
 }
 
-export function modifyConfig(config: Config): Config {
+export function watsonxModifyConfig(config: Config): Config {
   watsonxConfig.models.forEach(model => {
     config.models.push({
       options: model.options,
