@@ -1,4 +1,4 @@
-import {watsonx_modifyConfig} from "./continue-watsonx/src/watsonx"; 
+import { watsonxModifyConfig } from "./continue-watsonx/src/watsonx";
 
 // Original:
 //export function modifyConfig(config: Config): Config {
@@ -6,5 +6,5 @@ import {watsonx_modifyConfig} from "./continue-watsonx/src/watsonx";
 //}
 
 export function modifyConfig(config: Config): Config {
-  return watsonx_modifyConfig(config);
+  return watsonxModifyConfig(config);
 }

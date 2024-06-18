@@ -21,7 +21,7 @@ Simple CustomLLM definition to leverage IBM watsonx LLMs on Continue extentions.
 2. Clone this reposiroty in your `~/.continue/` directory
     ```sh
     cd ~/.continue/
-    git clone https://github.com/remiserra/continue-watsonx.git
+    git clone https://github.com/NoeSamaille/continue-watsonx.git
     ```
     and switch to the this branch
     ```sh
@@ -34,7 +34,7 @@ Simple CustomLLM definition to leverage IBM watsonx LLMs on Continue extentions.
     ```
 4. Copy the provided `config-sample.ts` to replace `~/.continue/config.ts`:
     ```sh
-    cp ~/.continue/continue-watsonx/src/config-samples.ts ~/.continue/config.ts
+    cp ~/.continue/continue-watsonx/src/config-sample.ts ~/.continue/config.ts
     ```
     or, if you have customized your `config.ts`, manually add the code to load the `Watsonx` module and use `Watsonx.addConfig()`:
     ```ts
@@ -81,3 +81,8 @@ Simple CustomLLM definition to leverage IBM watsonx LLMs on Continue extentions.
         ```
    3. *Optionally*, update `models` to comment/uncomment/edit model list based on LLMs deployed in your watsonx instance.
 6. Enjoy!
+
+## Contributors
+
+- @NoeSamaille
+- @remiserra

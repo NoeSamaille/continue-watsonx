@@ -1,4 +1,4 @@
-import { watsonx_url, watsonx_apiKey, watsonx_zenApiKeyBase64, watsonx_username, watsonx_password, watsonx_projectId } from "./watsonxenv";
+import { watsonxUrl, watsonxApiKey, watsonxZenApiKeyBase64, watsonxUsername, watsonxPassword, watsonxProjectId } from "./watsonxenv";
 
 interface accessToken {
   expiration: number,
@@ -6,6 +6,12 @@ interface accessToken {
 }
 
 const watsonxConfig = {
+  url: watsonxUrl,
+  apiKey: watsonxApiKey,
+  zenApiKeyBase64: watsonxZenApiKeyBase64,
+  username: watsonxUsername,
+  password: watsonxPassword,
+  projectId: watsonxProjectId,
   models: [
     {
       id: "ibm/granite-34b-code-instruct",
@@ -71,9 +77,9 @@ function templateGraniteMessages(msgs: ChatMessage[]): string {
 }
 
 async function getBearerToken(): Promise<accessToken> {
-  if (watsonx_url.includes('cloud.ibm.com')) {
+  if (watsonxConfig.url.includes('cloud.ibm.com')) {
     // watsonx SaaS
-    const wxToken = await (await fetch(`https://iam.cloud.ibm.com/identity/token?apikey=${watsonx_apiKey}&grant_type=urn:ibm:params:oauth:grant-type:apikey`, {
+    const wxToken = await (await fetch(`https://iam.cloud.ibm.com/identity/token?apikey=${watsonxConfig.apiKey}&grant_type=urn:ibm:params:oauth:grant-type:apikey`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -86,26 +92,26 @@ async function getBearerToken(): Promise<accessToken> {
     }
   } else {
     // watsonx Software
-    if (watsonx_zenApiKeyBase64 && watsonx_zenApiKeyBase64 !== "YOUR_WATSONX_ZENAPIKEY") {
+    if (watsonxConfig.zenApiKeyBase64 && watsonxConfig.zenApiKeyBase64 !== "YOUR_WATSONX_ZENAPIKEY") {
       // Using ZenApiKey auth
       return {
-        token: watsonx_zenApiKeyBase64,
+        token: watsonxConfig.zenApiKeyBase64,
         expiration: -1
       }
     } else {
       // Using username/password auth
-      const wxToken = await (await fetch(`${watsonx_url}/icp4d-api/v1/authorize`, {
+      const wxToken = await (await fetch(`${watsonxConfig.url}/icp4d-api/v1/authorize`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
         body: JSON.stringify({
-          "username": watsonx_username,
-          "password": watsonx_password
+          "username": watsonxConfig.username,
+          "password": watsonxConfig.password
         })
       })).json();
-      const wxTokenExpiry = await (await fetch(`${watsonx_url}/usermgmt/v1/user/tokenExpiry`, {
+      const wxTokenExpiry = await (await fetch(`${watsonxConfig.url}/usermgmt/v1/user/tokenExpiry`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -120,7 +126,7 @@ async function getBearerToken(): Promise<accessToken> {
   }
 }
 
-export function watsonx_modifyConfig(config: Config): Config {
+export function watsonxModifyConfig(config: Config): Config {
   watsonxConfig.models.forEach(model => {
     config.models.push({
       options: model.options,
@@ -134,7 +140,7 @@ export function watsonx_modifyConfig(config: Config): Config {
         } else {
           console.log(`Reusing token (expires in ${(watsonxConfig.accessToken.expiration - now) / 60} mins)`);
         }
-        const streamResponse = await fetch(`${watsonx_url}/ml/v1/text/generation_stream?version=2023-05-29`, {
+        const streamResponse = await fetch(`${watsonxConfig.url}/ml/v1/text/generation_stream?version=2023-05-29`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -150,7 +156,7 @@ export function watsonx_modifyConfig(config: Config): Config {
               "repetition_penalty": 1
             },
             "model_id": model.id,
-            "project_id": watsonx_projectId
+            "project_id": watsonxConfig.projectId
           })
         });
         if (!streamResponse.ok || streamResponse.body === null) {
