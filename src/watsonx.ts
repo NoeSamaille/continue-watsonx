@@ -32,6 +32,14 @@ const watsonxConfig = {
       }
     },
     {
+      id: "mistralai/mistral-large",
+      options: {
+        title: "watsonx - Mistral Large",
+        model: "mistral-medium",
+        systemMessage: `You are Mixtral Chat, an AI language model developed by Mistral AI. You are a cautious assistant. You carefully follow instructions. You are helpful and harmless and you follow ethical guidelines and promote positive behavior.`
+      }
+    },
+    {
       id: "meta-llama/llama-3-70b-instruct",
       options: {
         title: "watsonx - Llama 3",
