@@ -2,6 +2,8 @@
 
 Simple CustomLLM definition to leverage IBM watsonx LLMs on Continue extentions.
 
+***Note***: [watsonx is now available natively as a provider in continue !](https://docs.continue.dev/reference/Model%20Providers/watsonx)
+
 ![watsonx with Continue GIF](./assets/continue-watsonx.gif)
 
 ## Features
